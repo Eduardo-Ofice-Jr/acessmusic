@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="projectos.html">Músicas</a>
+        <a href="links.html">Redes Sociais</a>
+    </nav>
+
+    <div class="container">
+        <h1>Lançamentos</h1>
+        <div id="songsList">
+            <!-- As músicas vão aparecer aqui -->
+        </div>
+    </div>
+
+    <script>
+        async function loadSongs() {
+            try {
+                const res = await fetch('/api/songs');
+                let songs = await res.json();
+
+                const listArea = document.getElementById('songsList');
+
+                if (!songs || songs.length === 0) {
+                    listArea.innerHTML = "<p>Nenhuma música disponível ainda.</p>";
+                    return;
+                }
+
+                // Inverte a lista para a mais recente aparecer primeiro
+                songs.reverse();
+
+                // Gera o HTML usando as classes que estão no seu CSS (.card-info, .btn-download)
+                listArea.innerHTML = songs.map(s => `
+                <div class="card">
+                <div class="card-info">
+                 <h3>${s.title}</h3>
+                <p>Lançado em: ${s.month}</p>
+                </div>
+                <a href="/uploads/${s.filename}" class="btn-download" download>Fazer donwload</a>
+    </div>
+`).join('');
+
+            } catch (err) {
+                console.error("Erro ao carregar músicas:", err);
+                document.getElementById('songsList').innerHTML = "<p>Erro ao carregar lista.</p>";
+            }
+        }
+
+        // Executa a função
+        loadSongs();
+    </script>
+</body>
+</html>
