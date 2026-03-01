@@ -1,64 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel geral</title>
+    <title>Login - Painel Administrativo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
     <div class="container">
-    <h1>Meu painel</h1>
-    <form id="uploadForm" class="card" style="flex-direction: column;">
-        <input type="text" id="title" placeholder="Título da Música" required>
-        <input type="text" id="month" placeholder="Mês de Lançamento" required>
-        <input type="file" id="file" accept=".mp3,.zip,.rar" required>
-        <button type="submit">Carregar Música</button>
-    </form>
-
-    <h2>Minhas Músicas</h2>
-    <div id="adminList"></div>
-</div>
-
-<script>
-    const API = 'http://localhost:3000/api';
-    
-    async function loadSongs() {    
-    const res = await fetch(`${API}/songs`);
-    const songs = await res.json();
-
-    // INVERTER A ORDEM: A mais recente carregada aparece no topo
-    songs.reverse(); 
-
-    document.getElementById('adminList').innerHTML = songs.map(s => `
-        <div class="card" style="justify-content: space-between; align-items: center; text-align: left;">
-            <div class="card-info">
-                <strong>${s.title}</strong><br>
-                <small>Mês: ${s.month}</small>
-            </div>
-            <button class="btn-danger" onclick="deleteSong(${s.id})">Eliminar</button>
+        <div class="card-base form-container form-login">
+            <h1 style="text-align: center; font-size: 1.5rem;">Painel Admin</h1>
+            <form id="loginForm">
+                <input type="text" id="username" class="input-field" placeholder="Usuário" required>
+                <input type="password" id="password" class="input-field" placeholder="Palavra passe" required>
+                <button type="submit" class="btn-block">Entrar</button>
+            </form>
         </div>
-    `).join('');
-    }
+    </div>
 
-    document.getElementById('uploadForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('title', document.getElementById('title').value);
-        formData.append('month', document.getElementById('month').value);
-        formData.append('file', document.getElementById('file').files[0]);
+    <script>
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-        await fetch(`${API}/upload`, { method: 'POST', body: formData });
-        location.reload();
-    };
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user, pass }),
+                    credentials: 'include'
+                });
 
-    async function deleteSong(id) {
-        if(confirm('Apagar esta música?')) {
-            await fetch(`${API}/songs/${id}`, { method: 'DELETE' });
-            loadSongs();
-        }
-    }
-    loadSongs();
-</script>
+                if (res.ok) {
+                    window.location.href = '/admin/dashboard.html';
+                } else if (res.status === 401) {
+                    alert("Usuário ou senha incorretos!");
+                } else {
+                    alert("Erro no servidor, tente novamente.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro de conexão com o servidor");
+            }
+        };
+    </script>
 </body>
 </html>

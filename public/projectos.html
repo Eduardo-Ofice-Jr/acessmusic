@@ -39,13 +39,13 @@
                 // Gera o HTML usando as classes que estão no seu CSS (.card-info, .btn-download)
                 listArea.innerHTML = songs.map(s => `
                 <div class="card">
-                <div class="card-info">
-                 <h3>${s.title}</h3>
-                <p>Lançado em: ${s.month}</p>
-                </div>
+                    <div class="card-info">
+                        <h3>${s.title}</h3>
+                        <p>Lançado em: ${s.month}</p>
+                    </div>
                 <a href="/uploads/${s.filename}" class="btn-download" download>Fazer donwload</a>
-    </div>
-`).join('');
+                </div>
+                `).join('');
 
             } catch (err) {
                 console.error("Erro ao carregar músicas:", err);
@@ -53,7 +53,6 @@
             }
         }
 
-        // Executa a função
         loadSongs();
     </script>
 </body>
